@@ -7,32 +7,32 @@ from zxcvbn import password_strength as strength
 from PyQt5 import QtCore,QtWebKitWidgets
 @Singleton
 class MPManager():
+  dummyMsg='rebauth will guard your personal web informations'
   def __init__(self):
     self._browsers=[]
   def evalConfidence(self,msg):
     ''' :return 0~4 : strength '''
-    return strength(msg)
+    return strength(msg)['score'] if len(msg) else 0
   def login(self,hash):
     if type(hash) is str:hash=self.cryptor.hash(hash)
-    qry=LocalDBConnector.instance().executeQuery
-    tmp=qry('select CNT, dummy from Config limit 1')
     DB=LocalDBConnector.Instance()
-    DB.executeQuery('insert into Config values(?,?)',())
-    DB.commit()
-  if MPManager.Instance().login():self.parent().goTray()
-    if not len(tmp) or not tmp[0] or not tmp[1]:
-      pass
-    if not len(counter):
-      new_counter=getPrime(128)
-      qry('replace into config_val_key where id=?',counter)
-      counter=new_counter
-    self.cryptor = Cryptor(hash,counter)
-    if not len(dummy):
-      counter,dummy=list(map(lambda type,arg:qry('select value from config_val_%s where id=?'%type,arg),('int','key'),list(map(int,(counter,dummy)))))
-    self.cryptor = Cryptor(hash,counter)
+    qry=DB.executeQuery
+    tmp=qry('select CNT, dummy from Config limit 1')
+    counter,dummy=None,None
+    if not len(tmp) or not tmp[0] or not tmp[0][0] or not tmp[0][1]:# there's no MP yet. set MP
+      counter=getPrime(128)
+      self.cryptor = Cryptor(hash,counter)
+      dummy=self.cryptor.encrypt(self.dummyMsg)
+      DB.executeQuery('insert into Config values(?,?)',(counter,dummy))
+      DB.commit()
+    else:
+      counter,dummy = tmp[0]
+      self.cryptor = Cryptor(hash,counter)
+      if self.cryptor.decrypt(dummy) != self.dummyMsg: return False
     view=QtWebKitWidgets.QWebView()
     view.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-    view.setUrl(QtCore.QUrl('http://www.google.com'))
+    # view.setUrl(QtCore.QUrl('http://www.google.com'))
+    view.setUrl('http://www.google.com')
     view.show()
     self._browsers.append(view)
     return True
