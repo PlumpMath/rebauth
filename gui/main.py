@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Wed Nov 12 12:31:28 2014
+# Created: Tue Nov 25 19:46:59 2014
 #      by: PyQt5 UI code generator 5.3.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -62,13 +62,3 @@ class Ui_MainWindow(object):
         self.label_2.setText(_translate("MainWindow", "PW"))
 
 from encryptedlineedit import EncryptedLineEdit
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QWidget()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
-

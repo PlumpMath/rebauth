@@ -1,3 +1,3 @@
 if __name__=='__main__':
-  from MainWindow import MainWindow
+  from Client import *#MainWindow
   mainWindow=MainWindow.Instance()

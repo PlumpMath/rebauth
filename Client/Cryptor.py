@@ -5,11 +5,12 @@ from Crypto.Random import random
 from Crypto.Hash import SHA256
 from Crypto.Util import Counter
 
+hash=lambda msg : SHA256.new(msg.encode()).digest()
+
 class Cryptor():
-  hash=lambda msg : SHA256.new(msg.encode()).digest()
   def __init__(self,key,counter):
     self._encryptor = AES.new(key,AES.MODE_CTR,counter=Counter.new(128,initial_value=counter))
-  # def hash(self,msg):
-  #   return SHA256.new(msg).digest()
   def encrypt(self,msg):
     return self._encryptor.encrypt(msg)
+  def decrypt(self,code):
+    return self._encryptor.decrypt(code).decode()

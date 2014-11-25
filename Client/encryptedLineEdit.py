@@ -3,10 +3,8 @@ from Crypto import Cipher
 from Crypto.Cipher import AES
 from Crypto.Random import random
 from PyQt5 import QtCore, QtGui, QtWidgets
-from MPManager import MPManager
-from Cryptor import Cryptor
-
-hash=Cryptor.hash
+from Client.MPManager import MPManager
+from Client.Cryptor import hash
 
 class EncryptedLineEdit(QtWidgets.QLineEdit):
   def __init__(self,MainWindow,noMP,verifier=None):
@@ -15,12 +13,6 @@ class EncryptedLineEdit(QtWidgets.QLineEdit):
     self.availChars=digits+ascii_letters+punctuation
     self.getRandChar=lambda : random.choice(self.availChars)
     self._realString=''
-    if noMP and not verifier: #no mp set. make another verifying input
-      MainWindow.MPCheckLineEdit = EncryptedLineEdit(MainWindow,noMP, verifier=self)
-      w,h=self.width(),self.height()
-      MainWindow.MPCheckLineEdit.setGeometry(self.rect().adjusted(0,h+5,w,h+5))
-      MainWindow.MPCheckLineEdit.setObjectName("MPCheckLineEdit")
-      MainWindow.MPCheckLineEdit.setEchoMode(QtWidgets.QLineEdit.Password)
     self._noMP=noMP
     self._verifier=verifier
   def keyPressEvent(self,event): #QKeyEvent
@@ -29,8 +21,8 @@ class EncryptedLineEdit(QtWidgets.QLineEdit):
     #print(event.text(),event.text() in self.availChars,char)
     backspaceKey,deleteKey=QtCore.Qt.Key_Backspace, QtCore.Qt.Key_Delete
     if key in [backspaceKey,deleteKey] or char:
-      pos=self.cursorPosition()
-      self._realString=self._realString[:pos-(1 if key==backspaceKey else 0)]+char+self._realString[pos-(1 if key==deleteKey else 0):]
+      pos,width=self.cursorPosition(),len(self.selectedText())
+      self._realString=self._realString[:pos-(1 if key==backspaceKey else 0)]+char+self._realString[pos-(1 if key==deleteKey else 0)+width:]
       if char:
         randChar=self.getRandChar()
         event=QtGui.QKeyEvent(QtCore.QEvent(QtCore.QEvent.KeyPress).type(),ord(randChar),event.modifiers(),randChar)
@@ -45,12 +37,13 @@ class EncryptedLineEdit(QtWidgets.QLineEdit):
     if MPManager.Instance().evalConfidence(self._realString)<4 : return False
     MPH=hash(self._realString)
     if self._noMP:
-      theOtherEdit=self._verifier if self._verifier else self.parent().MPCheckLineEdit
+      theOtherEdit=self._verifier if self._verifier else self.parent().findChild(type(self),'MPCheckLineEdit')
       if not theOtherEdit.equals(MPH):return False
     if MPManager.Instance().login(MPH): #login success
+      self.clear()
       if self._noMP:
         self._noMP=False
-        self.parent().MPCheckLineEdit.close()
+        self.parent().findChild(type(self),'MPCheckLineEdit').close()
       self.parent().goTray()
     return False
   def equals(self,hashToCompare):
