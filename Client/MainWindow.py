@@ -8,7 +8,10 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWebKitWidgets
-from Client.LocalDBConnector import LocalDBConnector
+from .LocalDBConnector import LocalDBConnector
+
+__all__=['MainWindow']
+
 class Ui_MainWindow(object):
   def setupUi(self, MainWindow):
     MainWindow.setObjectName("MainWindow")
@@ -63,15 +66,14 @@ class Ui_MainWindow(object):
     cp = QtWidgets.QDesktopWidget().availableGeometry().center()
     qr.moveCenter(cp)
     MainWindow.move(qr.topLeft())
-
-from Client.encryptedLineEdit import EncryptedLineEdit
+from .encryptedLineEdit import EncryptedLineEdit
 from Singleton import Singleton
-
 @Singleton
 class MainWindow(QtWidgets.QWidget):
   def __init__(self):
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
+    print('main init')
+    from sys import argv, exit
+    app = QtWidgets.QApplication(argv)
     super().__init__()
     self.ui = Ui_MainWindow()
     self.ui.setupUi(self)
@@ -80,10 +82,11 @@ class MainWindow(QtWidgets.QWidget):
     # self._traymenu.addAction()
     self._trayIcon.setContextMenu(self._traymenu)
     self.show()
-    sys.exit(app.exec_())
+    exit(app.exec_())
   def show(self):
     self._trayIcon.hide()
     super().show()
   def goTray(self):
     self._trayIcon.show()
-    self.hide()
+    super().hide()
+# mainWindow=None #MainWindow()

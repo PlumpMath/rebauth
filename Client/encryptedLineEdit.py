@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from Client.MPManager import MPManager
 from Client.Cryptor import hash
 
+__all__=['EncryptedLineEdit']
 class EncryptedLineEdit(QtWidgets.QLineEdit):
   def __init__(self,MainWindow,noMP,verifier=None):
     super().__init__(MainWindow)

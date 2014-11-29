@@ -1,11 +1,12 @@
 from Singleton import Singleton
-from Client.LocalDBConnector import LocalDBConnector
-from Client.Cryptor import Cryptor
-# from Crypto import Random,Util
+from .LocalDBConnector import LocalDBConnector
+from .Cryptor import Cryptor
 from Crypto.Util.number import getPrime
 from zxcvbn import password_strength as strength
 from PyQt5 import QtCore,QtWebKitWidgets
 from threading import Timer
+
+__all__=['MPManager']
 @Singleton
 class MPManager():
   dummyMsg='rebauth will guard your personal web informations'
@@ -13,6 +14,8 @@ class MPManager():
     self._browsers=[]
     self._MPH=''
     self._timer=None
+    # from Client import MainWindow
+    # self._main=mainWindow
   def evalConfidence(self,msg):
     ''' :return 0~4 : strength '''
     return strength(msg)['score'] if len(msg) else 0
@@ -34,6 +37,7 @@ class MPManager():
     view.setAttribute(QtCore.Qt.WA_DeleteOnClose)
     view.setUrl(QtCore.QUrl('http://www.google.com'))
     view.show()
+    view.urlChanged=self.onUrlChange
     self._browsers.append(view)
     self._MPH = hash
     if self._timer is None:
@@ -49,5 +53,10 @@ class MPManager():
     for b in self._browsers:
       if b : b.close()
     self._browsers=[]
-    from Client.MainWindow import MainWindow
+    from .MainWindow import MainWindow
+    # mainWindow.show()
     MainWindow.Instance().show()
+    # self._main.show()
+  def onUrlChange(self,url):
+    print(LocalDBConnector.Instance().executeQuery("select * from auth limit 1 where url=?",url))
+# mpManager = MPManager()
