@@ -36,7 +36,6 @@ class Ui_MainWindow(object):
       self.MPCheckLineEdit.setGeometry(QtCore.QRect(10, 35, 171, 20))
       self.MPCheckLineEdit.setObjectName("MPCheckLineEdit")
       self.MPCheckLineEdit.setEchoMode(QtWidgets.QLineEdit.Password)
-      self.loginButton.hitButton = self.MPLineEdit.login
     # self.label_post_time_edit = QtWidgets.QLabel(MainWindow)
     # self.label_post_time_edit.setGeometry(QtCore.QRect(190, 40, 121, 16))
     # self.label_post_time_edit.setObjectName("label_post_time_edit")
@@ -46,9 +45,9 @@ class Ui_MainWindow(object):
     # self.timeLimitLineEdit = QtWidgets.QLineEdit(MainWindow)
     # self.timeLimitLineEdit.setGeometry(QtCore.QRect(140, 40, 41, 20))
     # self.timeLimitLineEdit.setObjectName("timeLimitLineEdit")
-
     self.retranslateUi(MainWindow)
     QtCore.QMetaObject.connectSlotsByName(MainWindow)
+    self.loginButton.clicked.connect(self.MPLineEdit.login)
     self.center(MainWindow)
     self.MPLineEdit.setFocus()
     # self.lineEdit.focusWidget()
@@ -57,7 +56,7 @@ class Ui_MainWindow(object):
     _translate = QtCore.QCoreApplication.translate
     MainWindow.setWindowTitle(_translate("MainWindow", "마스터 로그인"))
     self.loginButton.setText(_translate("MainWindow", "MP생성" if self.noMP else "로그인"))
-    self.changeButton.setText(_translate("MainWindow", "변경"))
+    self.changeButton.setText(_translate("MainWindow", "MP변경"))
     # self.label_post_time_edit.setText(_translate("MainWindow", "분 후 자동 로그아웃"))
     # self.label_pre_time_limit.setText(_translate("MainWindow", "부재시"))
 
@@ -71,22 +70,30 @@ from Singleton import Singleton
 @Singleton
 class MainWindow(QtWidgets.QWidget):
   def __init__(self):
-    print('main init')
     from sys import argv, exit
     app = QtWidgets.QApplication(argv)
     super().__init__()
     self.ui = Ui_MainWindow()
     self.ui.setupUi(self)
-    self._trayIcon=QtWidgets.QSystemTrayIcon(self)
-    self._traymenu=QtWidgets.QMenu(self)
-    # self._traymenu.addAction()
-    self._trayIcon.setContextMenu(self._traymenu)
+
+    from Client import clientResources_rc
+    self._icon=QtGui.QIcon()
+    self._icon.addPixmap(QtGui.QPixmap(':/client/resources/RebAuth_res_32.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    self.setWindowIcon(self._icon)
+    if QtWidgets.QSystemTrayIcon.isSystemTrayAvailable():
+      self._trayIcon=QtWidgets.QSystemTrayIcon(self._icon,self)
+      self._traymenu=QtWidgets.QMenu('RebAuth <unlocked>',self)
+      # self._traymenu.addAction()
+      self._trayIcon.setContextMenu(self._traymenu)
+    else:
+      self._trayIcon,self._traymenu=None,None
     self.show()
     exit(app.exec_())
   def show(self):
-    self._trayIcon.hide()
+    if self._trayIcon : self._trayIcon.hide()
     super().show()
-  def goTray(self):
-    self._trayIcon.show()
+  def hide(self):
+    if self._trayIcon :
+      self._trayIcon.show()
+      self._trayIcon.showMessage('MP 로그인','마스터로 로그인 되었습니다.')
     super().hide()
-# mainWindow=None #MainWindow()

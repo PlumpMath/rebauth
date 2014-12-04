@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Tue Nov 25 19:46:59 2014
+# Created: Wed Dec  3 22:09:53 2014
 #      by: PyQt5 UI code generator 5.3.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,6 +13,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(352, 90)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/client/RebAuth_res_32.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         self.loginButton = QtWidgets.QPushButton(MainWindow)
         self.loginButton.setGeometry(QtCore.QRect(190, 10, 71, 21))
         self.loginButton.setObjectName("loginButton")
@@ -62,3 +65,14 @@ class Ui_MainWindow(object):
         self.label_2.setText(_translate("MainWindow", "PW"))
 
 from encryptedlineedit import EncryptedLineEdit
+import clientResources_rc
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QWidget()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
+

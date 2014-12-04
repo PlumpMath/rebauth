@@ -9,7 +9,6 @@ class LocalDBConnector(DBConnector):
     from PyQt5.QtCore import QSettings
     from os import sep
     from os.path import dirname, join, exists
-    print('db init')
     setting = QSettings(QSettings.IniFormat, QSettings.UserScope,'KonkukUniv','rebauth')
     setting.isWritable() #it makes setting folder if doesn't exist
     self._cursor=connect(join(dirname(setting.fileName().replace('/',sep)),'rebauth_local.db'))

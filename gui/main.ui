@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>마스터 로그인</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="clientResources.qrc">
+    <normaloff>:/client/RebAuth_res_32.png</normaloff>:/client/RebAuth_res_32.png</iconset>
+  </property>
   <widget class="QPushButton" name="loginButton">
    <property name="geometry">
     <rect>
@@ -148,7 +152,9 @@
    <header location="global">encryptedlineedit.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="clientResources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>loginButton</sender>

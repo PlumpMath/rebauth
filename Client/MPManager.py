@@ -34,10 +34,12 @@ class MPManager():
     DB.updateConfig(config)#convert config to bytes for db and generate new dummy by encrypting again
     # print(hash, DB.getConfig())
     view=QtWebKitWidgets.QWebView()
+    view.setWindowTitle('RebAuth - Web')
     view.setAttribute(QtCore.Qt.WA_DeleteOnClose)
     view.setUrl(QtCore.QUrl('http://www.google.com'))
-    view.show()
+    view.showMaximized()
     view.urlChanged=self.onUrlChange
+    view.destroyed.connect(self._expireMP)
     self._browsers.append(view)
     self._MPH = hash
     if self._timer is None:
@@ -50,13 +52,18 @@ class MPManager():
     return self._MPH
   def _expireMP(self):
     self._MPH=''
-    for b in self._browsers:
-      if b : b.close()
-    self._browsers=[]
-    from .MainWindow import MainWindow
-    # mainWindow.show()
-    MainWindow.Instance().show()
-    # self._main.show()
+    self._browsers.clear()
+    from PyQt5.QtWidgets import QApplication, QWidget
+    from Client.MainWindow import MainWindow
+    # for w in QApplication.topLevelWindows():
+    #   print(w.objectName())
+    # print('------------')
+    for w in QApplication.topLevelWidgets():
+      #   print(w.objectName())
+      if w.objectName() == 'MainWindow':
+        w.show()
+        print('main showed')
+        break
   def onUrlChange(self,url):
     print(LocalDBConnector.Instance().executeQuery("select * from auth limit 1 where url=?",url))
 # mpManager = MPManager()

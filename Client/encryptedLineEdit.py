@@ -35,17 +35,22 @@ class EncryptedLineEdit(QtWidgets.QLineEdit):
       self.login()
     super().keyPressEvent(event)
   def login(self,event=None):
-    if MPManager.Instance().evalConfidence(self._realString)<4 : return False
+    if MPManager.Instance().evalConfidence(self._realString)<4 :
+      QtWidgets.QMessageBox.critical(self, '로그인 에러', '마스터 패스워드가 틀렸습니다.')
+      return False
     MPH=hash(self._realString)
     if self._noMP:
       theOtherEdit=self._verifier if self._verifier else self.parent().findChild(type(self),'MPCheckLineEdit')
       if not theOtherEdit.equals(MPH):return False
     if MPManager.Instance().login(MPH): #login success
-      self.clear()
+      # super().hide()
       if self._noMP:
         self._noMP=False
         self.parent().findChild(type(self),'MPCheckLineEdit').close()
-      self.parent().goTray()
+      # loginButt,changeButt=list(map(self.parent().findChild,(QtWidgets.QPushButton,)*2,('loginButton','changeButton')))
+      # if loginButt: loginButt.hide()
+      # if changeButt: changeButt.show()
+      self.parent().hide()
     return False
   def equals(self,hashToCompare):
     return hash(self._realString)==hashToCompare
