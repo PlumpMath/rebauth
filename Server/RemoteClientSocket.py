@@ -1,11 +1,12 @@
 from socketserver import TCPServer, BaseRequestHandler
 from ClientSocket import ClientSocket
 
-class REmoteClientSocket(ClientSocket):
+class RemoteClientSocket(ClientSocket):
   _clientAddress=''
   def listen(self):
     pass
-  def _servLocalClient(self):
+  def _servRemoteClient(self):
+
     pass
   def close(self):
     pass
