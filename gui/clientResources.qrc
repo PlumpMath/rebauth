@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="client">
+    <file>resources/RebAuth_res_32.png</file>
+    <file>resources/RebAuth_res_64.png</file>
+  </qresource>
+</RCC>
