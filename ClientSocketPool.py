@@ -7,7 +7,10 @@ from random import choice
 class ClientSocketPool(Server):
   _masterList = []
   def __init__(self, port, db):
-    super().__init__(('0.0.0.0', port), ClientSocket)
+    try:
+      super().__init__(('0.0.0.0', port), ClientSocket)
+    except:
+      super().__init__(('0.0.0.0', port+1), ClientSocket)
     self._servThread = Thread(target=self.serve_forever)
     self._servThread.start()
     self._port,self.db = port, db

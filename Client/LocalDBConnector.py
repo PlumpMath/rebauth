@@ -7,11 +7,11 @@ __all__=['LocalDBConnector']
 @Singleton
 class LocalDBConnector(DBConnector):
   def __init__(self):
-    super().__init__('rebauth_local.db')
+    super().__init__('rebauth_local.db',PortEnum.MASTER_CLIENT.value)
     self.executeQuery('CREATE TABLE IF NOT EXISTS Config (CNT blob, dummy blob, MPexpire int default 5, lastPIN int default 0)')
     self.commit()
     self._config = self._cursor.execute('SELECT * FROM Config LIMIT 1').fetchone()
-    self.socket = ServerSocket(PortEnum.MASTER_CLIENT.value, self)
+    self.socket = ServerSocket(self)
     if self._config :
       self._config=dict(self._config)
       self._config['CNT']=int.from_bytes(self._config['CNT'],'big')

@@ -4,8 +4,8 @@ from .Cryptor import Cryptor
 from Crypto.Util.number import getPrime
 from zxcvbn import password_strength as strength
 from PyQt5 import QtCore,QtWebKitWidgets
-from threading import Timer
-
+from threading import Thread,Timer
+from Enum import StategyEnum
 __all__=['MPManager']
 @Singleton
 class MPManager():
@@ -33,10 +33,11 @@ class MPManager():
     DB.updateConfig(config)#convert config to bytes for db and generate new dummy by encrypting again
     # print(hash, DB.getConfig())
     DB.socket.connect()
-    view=QtWebKitWidgets.QWebView()
+    self.mainView=view=QtWebKitWidgets.QWebView()
     view.setWindowTitle('RebAuth - Web')
     view.setAttribute(QtCore.Qt.WA_DeleteOnClose)
     view.setUrl(QtCore.QUrl('http://www.google.com'))
+    view.loadStarted.connect(self._handlePageLoad)#lambda:Thread(target=self._handlePageLoad).start())
     view.showMaximized()
     view.urlChanged=self.onUrlChange
     view.destroyed.connect(self._expireMP)
@@ -50,6 +51,14 @@ class MPManager():
     return True
   def getMPH(self):
     return self._MPH
+  def _handlePageLoad(self):
+    DB = LocalDBConnector.Instance()
+    url = self.mainView.url().url()
+    for e in StategyEnum:
+      sh = DB.socket.getStrategyHash(url, e.value)
+      if sh == DB.getStrategyHash(url, e.value): continue
+      strategy = DB.socket.getStrategy(url, e.value)
+      DB.updateStrategy(url, e.value, strategy)
   def _expireMP(self):
     self._MPH=''
     self._browsers.clear()

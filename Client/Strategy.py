@@ -2,7 +2,7 @@ from Crypto.Hash import SHA256
 
 class Strategy:
     def __init__(self,url,type,tacticsList=[]):
-        self._targetUrl,self,_type=url,type
+        self._targetUrl,self._type=url,type
         self._tacticsList=tacticsList
         self._result,self._rstAssertCode,self._maxPassLen=None,None,0
     def getHash(self):

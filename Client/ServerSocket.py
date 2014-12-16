@@ -4,7 +4,7 @@ from threading import Thread
 from os import fstat
 from os.path import join,exists
 from time import sleep
-
+from Client.TacticsFactory import createTactics
 from Enum import SocketEnum, IPCEnum, PortEnum
 from Client.Strategy import Strategy
 from Client.Tactics import Tactics
@@ -19,7 +19,6 @@ class SocketlikeIPC():
     self._IPCrecv=self._IPC.open_r(self._IPCRecvPath)
     self.sendall(str(IPCEnum.ACK.value))
     msg=self.recv()
-    print(msg)
     if msg==str(IPCEnum.ACK.value): return True
     self._clearSend()
     self._clearRecv()
@@ -38,7 +37,7 @@ class SocketlikeIPC():
   def recv(self, buffersize=-1, flags=None):
     msg = ''
     self._IPCrecv.seek(0)
-    for i in range(1000//100):
+    for i in range(3):
       msg=self._IPC.open_r(self._IPCRecvPath).read(buffersize)
       if msg : break
       sleep(1.001)
@@ -56,7 +55,7 @@ class SocketlikeIPC():
     msg=''
     msg=self.recv()
     if msg==str(IPCEnum.ERROR.value): return None
-    Strategy(url,type)
+    return Strategy(url,type,[createTactics(type,script) for script in msg.split('\x1f')])
   def getCertKey(self):
     pass
 
@@ -64,22 +63,27 @@ class ServerSocket(SocketlikeIPC, socket):
   def __init__(self,db):
     self._ipcPath=db.getSettingPath()
     super(type(self),self).__init__(self._ipcPath)
-    if super(type(self),self)._connect(): return
+    if super(type(self),self)._connect():
+      print('IPC connect succeed. Welcome back, administrator.')
+      return
     print('IPC failed. proceeding with TCP.')
     super(type(self)) #unbound
     super(socket,self).__init__()
-    self.connect(('racu.idea.sh', PortEnum.MAIN_SERVER.value))
-    lastPin = self.server.db.executeQuery('select lastPIN from Config limit 1')
-    print('lastPin =', lastPin)
-    pinmsg = int.to_bytes(SocketEnum.PIN.value, 1, 'big') + int.to_bytes(lastPin[0]) if lastPin and 10**3<=lastPin[0]<10**4 else b''
-    msg=''
-    # while not msg:
-    self.sendall(pinmsg)
-    msg = self.recv()
-    if not msg:
+    try:
+      super(socket,self).connect(('racu.idea.sh', PortEnum.MAIN_SERVER.value))
+      lastPin = db.getConfig()
+      print('lastPin =', lastPin, len(lastPin))
+      pinmsg = int.to_bytes(SocketEnum.PIN.value, 1, 'big') + int.to_bytes(lastPin[0]) if 10**3<=lastPin['lastPIN']<10**4 else b''
+      msg=''
+      # while not msg:
+      super(socket, self).sendall(pinmsg)
+      msg = super(socket,self).recv()
+      if not msg:
+        print('main server connect error')
+        return
+    except:
       print('main server connect error')
-      return
-    
+
     # self._IPC,self._ipcMode=Template(),False
   # def recv(self,buffersize=-1):
   #   if self._ipcMode:

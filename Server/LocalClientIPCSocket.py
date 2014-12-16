@@ -71,29 +71,17 @@ class LocalClientIPCSocket(Template):
         self.send(str(IPCEnum.ACK.value)+str(order))
         # self.write(int.to_bytes(IPCEnum.ERROR,1,'big'))
     def _shakeHand(self):
-        print('shakeHand')
+        print('IPC shakeHand')
         # if msg<36 or msg[0]!=str(IPCEnum.ACK.value): return
         self.send(str(IPCEnum.ACK.value))
     def _getStrategyHash(self,type,urlLen,url):
         if not type.isdecimal() or not urlLen.isdecimal() or len(url)!=int(urlLen): return
-        ID=self.db.executeQuery('select rowid from Strategy where URL=? and type=?', (url, int(type)))
-        if ID:
-            hash=SHA256.new()
-            rst=self.db.executeQuery('select script from Tactics where ID=? order by exec_order',ID[0])
-            for script in rst:
-                hash.update(script)
-            # self.send(int.to_bytes(IPCEnum.ACK,1,'big')+hash.hexdigest())
-            self.send(hash.hexdigest())
-        else:
-            self.send(str(IPCEnum.ERROR.value))
+        hash = self.db.getStrategyHash(url,int(type))
+        self.send(hash.hexdigest if hash else str(IPCEnum.ERROR.value))
     def _getStrategy(self,type,urlLen,url):
         if not type.isdecimal() or not urlLen.isdecimal() or len(url)!=int(urlLen): return
-        ID=self.db.executeQuery('select ID from Strategy where URL=? and type=?', (url, int(type)))
-        if ID:
-            rst=self.db.executeQuery('select script from Tactics where ID=? order by exec_order',ID[0])
-            self.send('\x1f'.join(tup[0] for tup in rst))
-        else:
-            self.send(str(IPCEnum.ERROR.value))
+        s=self.db.getStrategy(url, int(type))
+        self.send('\x1f'.join([tup[0] for tup in s]) if s else str(IPCEnum.ERROR.value))
     def _listAllStrategy(self):
         rst=self.db.executeQuery('select * from Strategy')
-        self.send('\x1f'.join(tup[0] for tup in rst))
+        self.send('\x1f'.join([tup[0] for tup in rst]))
