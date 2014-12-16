@@ -7,8 +7,12 @@ class SocketEnum(Enum):
 @unique
 class IPCEnum(Enum):
     ERROR=0xff
-    ACK,GET_HASH,GET,UPDATE,LIST_ALL=range(5)
+    ACK,SYNC_FETCH,SYNC_PULL,UPDATE,LIST_ALL,SHAKEHAND,SHAKE_SUCC=range(7)
 class StategyEnum(Enum):
     GET,JOIN,LOGIN,CHANGE=range(4)
 class TacticsEnum(Enum):
     REGEX,JSCRIPT,JSON,FORM=range(4)
+
+class PortEnum(Enum):
+    MAIN_SERVER=39274
+    MASTER_CLIENT=38274

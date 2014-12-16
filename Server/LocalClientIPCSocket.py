@@ -4,23 +4,29 @@ from os.path import dirname, join
 from DBConnector import DBConnector
 from Crypto.Hash import SHA256
 from Enum import IPCEnum
+from threading import Thread
 
 class LocalClientIPCSocket(Template):
     def __init__(self,db):
         super().__init__()
         self._path=db.getSettingPath()
-        self.send=super().open_w(join(self._path,'sToCPipe')).write
-        self._codeLst=((self._getStrategyHash,1,4),(self._getStrategy,1,4),(self._updateStrategy,1,4),(self._listAllStrategy,))
+        self._IPCRecvPath,self._IPCSendPath=map(join,(self._path,)*2,('cToSPipe','sToCPipe'))
+        self._codeLst=((self._shakeHand,),(self._getStrategyHash,1,4),(self._getStrategy,1,4),(self._updateStrategy,1,4),(self._listAllStrategy,))
         self.db=db
+        self.send('')
+        Thread(target=self._servLocalClient).start()
+    def send(self,msg):
+        super().open_w(self._IPCSendPath).write(msg)
+    def _clearRecv(self):
+        super().open_w(self._IPCRecvPath).write('')
     def recv(self):
         '''
         read and clear the reading pipe
         :return:None on no pipe, str on pipe read
         '''
         try:
-            path=join(self._path,'cToSPipe')
-            msg=super().open_r(path).recv()
-            super().open_w(path).write('')
+            msg=super().open_r(self._IPCRecvPath).read()
+            self._clearRecv()
             return msg
         except FileNotFoundError : return None
     def _servLocalClient(self):
@@ -28,10 +34,10 @@ class LocalClientIPCSocket(Template):
         from time import sleep
         while True:
             msg=self.recv()
-            if msg and len(msg)>1 and msg[0].isdigit():
+            if msg and len(msg)>=1 and msg[0].isdigit():
                 fnNum=int(msg[0])
-                if 0 < fnNum < len(self._codeLst):
-                    code=self._codeLst[fnNum-1]
+                if 0 <= fnNum < len(self._codeLst):
+                    code=self._codeLst[fnNum]
                     fn,arg,ind=code[0],[],1
                     for i in range(1,len(code)):
                         if ind+code[i]>=len(msg) : break
@@ -40,7 +46,7 @@ class LocalClientIPCSocket(Template):
                     if len(msg) > ind:
                         arg.append(msg[ind:])
                     fn(*arg)
-            sleep(1000)
+            sleep(0.5)
     def _updateStrategy(self,type,urlLen,body):
         if not type.isdecimal() or not urlLen.isdecimal() or len(body)<int(urlLen)+2: return
         type,urlLen=map(int,(type,urlLen))
@@ -64,6 +70,10 @@ class LocalClientIPCSocket(Template):
         #     self.db.executeQuery('insert into Strategy')
         self.send(str(IPCEnum.ACK.value)+str(order))
         # self.write(int.to_bytes(IPCEnum.ERROR,1,'big'))
+    def _shakeHand(self):
+        print('shakeHand')
+        # if msg<36 or msg[0]!=str(IPCEnum.ACK.value): return
+        self.send(str(IPCEnum.ACK.value))
     def _getStrategyHash(self,type,urlLen,url):
         if not type.isdecimal() or not urlLen.isdecimal() or len(url)!=int(urlLen): return
         ID=self.db.executeQuery('select rowid from Strategy where URL=? and type=?', (url, int(type)))

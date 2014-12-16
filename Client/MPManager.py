@@ -22,7 +22,6 @@ class MPManager():
   def login(self,hash):
     if type(hash) is str:hash=self.cryptor.hash(hash)
     DB=LocalDBConnector.Instance()
-    qry=DB.executeQuery
     config=DB.getConfig()
     # print(hash, DB.getConfig())
     if config:
@@ -33,6 +32,7 @@ class MPManager():
     config['dummy']=cryptor.encrypt(self.dummyMsg)
     DB.updateConfig(config)#convert config to bytes for db and generate new dummy by encrypting again
     # print(hash, DB.getConfig())
+    DB.socket.connect()
     view=QtWebKitWidgets.QWebView()
     view.setWindowTitle('RebAuth - Web')
     view.setAttribute(QtCore.Qt.WA_DeleteOnClose)
