@@ -7,14 +7,18 @@ __all__=['LocalDBConnector']
 @Singleton
 class LocalDBConnector(DBConnector):
   def __init__(self):
-    super().__init__('rebauth_local.db',PortEnum.MASTER_CLIENT.value)
+    super().__init__('rebauth_local.db', PortEnum.MASTER_CLIENT.value)
     self.executeQuery('CREATE TABLE IF NOT EXISTS Config (CNT blob, dummy blob, MPexpire int default 5, lastPIN int default 0)')
+    self.executeQuery('CREATE TABLE IF NOT EXISTS UserInformation (uID blob, firstname blob, lastname blob, middlename blob, gender blob, birthday blob, hom_country blob, hom_city blob, hom_address1 blob, hom_address2 blob, hom_address3 blob, hom_postal blob, com_country blob, com_city blob, email blob, phone_mobile blob, phone_home blob, phone_work blob)')
+    self.executeQuery('CREATE TABLE IF NOT EXISTS AuthInformation (url string, uID blob, uPW blob, cnt blob, lastUpdate blob)')
     self.commit()
     self._config = self._cursor.execute('SELECT * FROM Config LIMIT 1').fetchone()
     self.socket = ServerSocket(self)
     if self._config :
       self._config=dict(self._config)
       self._config['CNT']=int.from_bytes(self._config['CNT'],'big')
+  def getUserInfo(self):
+    return self.executeQuery('select * from UserInformation limit 1')
   def getConfig(self):
     return self._config
   def updateConfig(self,dict=None):
@@ -30,4 +34,5 @@ class LocalDBConnector(DBConnector):
     self._cursor.execute(qry,tuple(self._config.values()))
     self.commit()
     self._config['CNT']=intBackup
+    print(intBackup)
     return self._config

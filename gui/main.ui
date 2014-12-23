@@ -7,20 +7,20 @@
     <x>0</x>
     <y>0</y>
     <width>352</width>
-    <height>90</height>
+    <height>112</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>마스터 로그인</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="clientResources.qrc">
+   <iconset>
     <normaloff>:/client/RebAuth_res_32.png</normaloff>:/client/RebAuth_res_32.png</iconset>
   </property>
   <widget class="QPushButton" name="loginButton">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>270</x>
      <y>10</y>
      <width>71</width>
      <height>21</height>
@@ -51,7 +51,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>171</width>
+     <width>251</width>
      <height>20</height>
     </rect>
    </property>
@@ -62,88 +62,118 @@
     <enum>QLineEdit::Password</enum>
    </property>
   </widget>
-  <widget class="QLabel" name="label_post_time_edit">
+  <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>42</y>
-     <width>121</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>분 후 자동 로그아웃</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_pre_time_limit">
-   <property name="geometry">
-    <rect>
-     <x>100</x>
-     <y>42</y>
-     <width>56</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>부재시</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="timeLimitLineEdit">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>40</y>
-     <width>41</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_2">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
+     <x>0</x>
      <y>70</y>
-     <width>101</width>
-     <height>20</height>
+     <width>351</width>
+     <height>41</height>
     </rect>
    </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLabel" name="label_pre_time_limit">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>10</y>
+      <width>56</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>부재시</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_post_time_edit">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>10</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>분 후 자동 로그아웃</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="timeLimitLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>10</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLineEdit" name="PWLineEdit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>72</y>
-     <width>21</width>
-     <height>16</height>
+     <x>210</x>
+     <y>40</y>
+     <width>113</width>
+     <height>20</height>
     </rect>
-   </property>
-   <property name="text">
-    <string>PIN</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>72</y>
+     <y>40</y>
      <width>21</width>
-     <height>16</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
     <string>PW</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_3">
+  <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>220</x>
-     <y>70</y>
-     <width>113</width>
+     <x>50</x>
+     <y>40</y>
+     <width>21</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PIN</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="PINLineEdit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>40</y>
+     <width>101</width>
      <height>20</height>
     </rect>
    </property>
   </widget>
+  <zorder>changeButton</zorder>
+  <zorder>loginButton</zorder>
+  <zorder>lineEdit</zorder>
+  <zorder>frame</zorder>
+  <zorder>PWLineEdit</zorder>
+  <zorder>label_2</zorder>
+  <zorder>label</zorder>
+  <zorder>PINLineEdit</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -169,6 +199,22 @@
     <hint type="destinationlabel">
      <x>95</x>
      <y>19</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MainWindow</sender>
+   <signal>destroyed()</signal>
+   <receiver>label_2</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>175</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>200</x>
+     <y>79</y>
     </hint>
    </hints>
   </connection>

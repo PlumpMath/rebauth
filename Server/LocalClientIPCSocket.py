@@ -20,10 +20,8 @@ class LocalClientIPCSocket(Template):
     def _clearRecv(self):
         super().open_w(self._IPCRecvPath).write('')
     def recv(self):
-        '''
-        read and clear the reading pipe
-        :return:None on no pipe, str on pipe read
-        '''
+        ''' read and clear the reading pipe
+        :return:None on no pipe, str on pipe read '''
         try:
             msg=super().open_r(self._IPCRecvPath).read()
             self._clearRecv()

@@ -62,28 +62,29 @@ class SocketlikeIPC():
 class ServerSocket(SocketlikeIPC, socket):
   def __init__(self,db):
     self._ipcPath=db.getSettingPath()
-    super(type(self),self).__init__(self._ipcPath)
-    if super(type(self),self)._connect():
+    SocketlikeIPC.__init__(self, self._ipcPath)
+    # super(type(self),self).__init__(self._ipcPath)
+    # if super(type(self),self)._connect():
+    if SocketlikeIPC._connect(self):
       print('IPC connect succeed. Welcome back, administrator.')
       return
     print('IPC failed. proceeding with TCP.')
     super(type(self)) #unbound
-    super(socket,self).__init__()
+    socket.__init__(self)
     try:
-      super(socket,self).connect(('racu.idea.sh', PortEnum.MAIN_SERVER.value))
+      socket.connect(self,('racu.idea.sh', PortEnum.MAIN_SERVER.value))
       lastPin = db.getConfig()
       print('lastPin =', lastPin, len(lastPin))
       pinmsg = int.to_bytes(SocketEnum.PIN.value, 1, 'big') + int.to_bytes(lastPin[0]) if 10**3<=lastPin['lastPIN']<10**4 else b''
-      msg=''
+      msg = ''
       # while not msg:
-      super(socket, self).sendall(pinmsg)
-      msg = super(socket,self).recv()
+      socket.sendall(self,pinmsg)
+      msg = socket.recv(self)
       if not msg:
         print('main server connect error')
         return
     except:
       print('main server connect error')
-
     # self._IPC,self._ipcMode=Template(),False
   # def recv(self,buffersize=-1):
   #   if self._ipcMode:

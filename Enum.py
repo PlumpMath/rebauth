@@ -8,7 +8,7 @@ class SocketEnum(Enum):
 class IPCEnum(Enum):
     ERROR=0xff
     ACK,SYNC_FETCH,SYNC_PULL,UPDATE,LIST_ALL,SHAKEHAND,SHAKE_SUCC=range(7)
-class StategyEnum(Enum):
+class StrategyEnum(Enum):
     GET,JOIN,LOGIN,CHANGE=range(4)
 class TacticsEnum(Enum):
     REGEX,JSCRIPT,JSON,FORM=range(4)

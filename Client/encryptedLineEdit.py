@@ -7,6 +7,7 @@ from Client.MPManager import MPManager
 from Client.Cryptor import hash
 
 __all__=['EncryptedLineEdit']
+
 class EncryptedLineEdit(QtWidgets.QLineEdit):
   def __init__(self,MainWindow,noMP,verifier=None):
     super().__init__(MainWindow)
@@ -26,6 +27,7 @@ class EncryptedLineEdit(QtWidgets.QLineEdit):
       self._realString=self._realString[:pos-(1 if key==backspaceKey else 0)]+char+self._realString[pos-(1 if key==deleteKey else 0)+width:]
       if char:
         randChar=self.getRandChar()
+        print(randChar)
         event=QtGui.QKeyEvent(QtCore.QEvent(QtCore.QEvent.KeyPress).type(),ord(randChar),event.modifiers(),randChar)
       if self._verifier:
         QtWidgets.QToolTip.showText(self.mapToGlobal(QtCore.QPoint()),'일치합니다.' if self._verifier.equals(hash(self._realString)) else '일치하지 않습니다.')
@@ -39,11 +41,13 @@ class EncryptedLineEdit(QtWidgets.QLineEdit):
       QtWidgets.QMessageBox.critical(self, '로그인 에러', '마스터 패스워드가 틀렸습니다.')
       return False
     MPH=hash(self._realString)
+    print(self.text())
+    print(MPH)
     if self._noMP:
       theOtherEdit=self._verifier if self._verifier else self.parent().findChild(type(self),'MPCheckLineEdit')
       if not theOtherEdit.equals(MPH):return False
     if MPManager.Instance().login(MPH): #login success
-      # super().hide()
+      self.clear()
       if self._noMP:
         self._noMP=False
         self.parent().findChild(type(self),'MPCheckLineEdit').close()
@@ -51,6 +55,10 @@ class EncryptedLineEdit(QtWidgets.QLineEdit):
       # if loginButt: loginButt.hide()
       # if changeButt: changeButt.show()
       self.parent().hide()
+      self.parent().ui.trayIcon.showMessage('MP 로그인','마스터로 로그인 되었습니다.')
     return False
+  def clear(self):
+    super().clear()
+    self._realString = ''
   def equals(self,hashToCompare):
     return hash(self._realString)==hashToCompare
