@@ -27,7 +27,6 @@ class EncryptedLineEdit(QtWidgets.QLineEdit):
       self._realString=self._realString[:pos-(1 if key==backspaceKey else 0)]+char+self._realString[pos-(1 if key==deleteKey else 0)+width:]
       if char:
         randChar=self.getRandChar()
-        print(randChar)
         event=QtGui.QKeyEvent(QtCore.QEvent(QtCore.QEvent.KeyPress).type(),ord(randChar),event.modifiers(),randChar)
       if self._verifier:
         QtWidgets.QToolTip.showText(self.mapToGlobal(QtCore.QPoint()),'일치합니다.' if self._verifier.equals(hash(self._realString)) else '일치하지 않습니다.')
@@ -41,8 +40,9 @@ class EncryptedLineEdit(QtWidgets.QLineEdit):
       QtWidgets.QMessageBox.critical(self, '로그인 에러', '마스터 패스워드가 틀렸습니다.')
       return False
     MPH=hash(self._realString)
-    print(self.text())
-    print(MPH)
+    if __name__ == '__debug__':
+      print(self.text())
+      print(MPH)
     if self._noMP:
       theOtherEdit=self._verifier if self._verifier else self.parent().findChild(type(self),'MPCheckLineEdit')
       if not theOtherEdit.equals(MPH):return False

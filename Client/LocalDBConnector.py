@@ -34,5 +34,4 @@ class LocalDBConnector(DBConnector):
     self._cursor.execute(qry,tuple(self._config.values()))
     self.commit()
     self._config['CNT']=intBackup
-    print(intBackup)
     return self._config
