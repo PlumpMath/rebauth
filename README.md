@@ -16,6 +16,10 @@ python libraries
   zxcvbn (currently using hand-modified one because of lack of python3 support)
   PyCrypto
 
+Current follow ups/todos
+=======================
+https://waffle.io/chidea/rebauth
+
 Known issues
 ============
 
